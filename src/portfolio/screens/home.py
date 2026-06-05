@@ -21,7 +21,6 @@ class HomeScreen(Screen):
         Binding("left,up", "move(-1)", "prev", show=False),
         Binding("right,down", "move(1)", "next", show=False),
         Binding("enter", "open", "open", show=False),
-        Binding("q", "quit", "quit", show=False),
     ]
 
     selected: reactive[int] = reactive(0)
@@ -86,6 +85,3 @@ class HomeScreen(Screen):
         section = c.sections.get(entry.key)
         if section is not None:
             self.app.push_screen(ListingScreen(section))
-
-    def action_quit(self) -> None:
-        self.app.exit()
