@@ -61,8 +61,8 @@ environment, installs and locks dependencies, and runs the project
 `pip` + `venv`.
 
 **TOML** — the content format. All copy (bio, projects, links) lives in
-[src/portfolio/content/portfolio.toml](src/portfolio/content/portfolio.toml) and
-is read with Python's built-in `tomllib`, keeping text separate from code so the
+[src/portfolio/data](src/portfolio/data), split into one file per section and
+read with Python's built-in `tomllib`, keeping text separate from code so the
 portfolio can be edited without touching the UI.
 
 ## Project layout
@@ -71,8 +71,9 @@ portfolio can be edited without touching the UI.
 src/portfolio/
 ├── server.py          # AsyncSSH server + per-session PTY bridge
 ├── app.py / tui.py    # the Textual application
+├── content.py         # loads the data/ files into typed objects
 ├── screens/           # home, listing, detail, contacts
-├── content/           # copy, split by section (data-driven)
+├── data/              # your copy, split by section (data-driven)
 │   ├── home.toml          # bio + the home-screen menu
 │   ├── creations.toml     # Creations section
 │   ├── reflections.toml   # Reflections section
@@ -82,11 +83,11 @@ src/portfolio/
 └── theme.tcss         # Textual stylesheet
 ```
 
-All text content lives in [src/portfolio/content](src/portfolio/content), split
-into one file per section, so the site can be updated without touching any UI
-code. The menu in [home.toml](src/portfolio/content/home.toml) drives the rest:
-each entry loads the matching `content/<key>.toml`, so adding a section is just a
-new menu entry plus a new file.
+All text content lives in [src/portfolio/data](src/portfolio/data), split into
+one file per section, so the site can be updated without touching any UI code.
+The menu in [home.toml](src/portfolio/data/home.toml) drives the rest: each
+entry loads the matching `data/<key>.toml`, so adding a section is just a new
+menu entry plus a new file.
 
 ## Running it locally
 

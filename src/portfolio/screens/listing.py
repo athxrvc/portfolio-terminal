@@ -34,7 +34,10 @@ class ListingScreen(Screen):
         with Vertical():
             yield Static(id="body")
             yield Static(
-                Text("[\u2191 \u2193 to select \u00b7 enter to open \u00b7 esc back]", style=DIM),
+                Text(
+                    "[\u2191 \u2193 to select \u00b7 enter to open \u00b7 esc to go back \u00b7 q to quit]",
+                    style=DIM,
+                ),
                 classes="hint",
             )
 

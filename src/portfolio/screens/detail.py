@@ -26,7 +26,9 @@ class DetailScreen(Screen):
     def compose(self) -> ComposeResult:
         with Vertical():
             yield Static(self._body(), id="body")
-            yield Static(Text("[esc] back", style=DIM), classes="hint")
+            yield Static(
+                Text("[esc to go back \u00b7 q to quit]", style=DIM), classes="hint"
+            )
 
     def _body(self) -> Text:
         t = Text()
@@ -40,9 +42,10 @@ class DetailScreen(Screen):
         t.append("\n")
 
         for paragraph in self.item.body:
-            t.append(paragraph + "\n\n", style=DIM)
+            t.append(paragraph + "\n", style=DIM)
 
         if self.item.url:
+            t.append("\n")
             t.append("View \u2192 ", style=f"bold {ACCENT}")
             t.append(self.item.url + "\n", style=ACCENT)
         return t

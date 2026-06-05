@@ -1,5 +1,5 @@
 Screen {
-    background: #1b212c;
+    background: #000000;
     color: #c8d0da;
 }
 
@@ -25,7 +25,7 @@ Screen {
 }
 
 .hint {
-    height: 1;
-    padding: 0 2 1 2;
+    height: auto;
+    padding: 1 2;
     color: #6b7480;
 }
