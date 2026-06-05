@@ -6,7 +6,7 @@ __pycache__/
 dist/
 build/
 
-# Generated SSH host keys (never commit these)
+# Generated SSH host keys
 keys/
 
 # macOS

@@ -72,14 +72,21 @@ src/portfolio/
 ├── server.py          # AsyncSSH server + per-session PTY bridge
 ├── app.py / tui.py    # the Textual application
 ├── screens/           # home, listing, detail, contacts
-├── content/           # portfolio.toml — all copy lives here (data-driven)
+├── content/           # copy, split by section (data-driven)
+│   ├── home.toml          # bio + the home-screen menu
+│   ├── creations.toml     # Creations section
+│   ├── reflections.toml   # Reflections section
+│   └── contacts.toml      # Contacts links
 ├── art/               # ASCII portrait + name banner
 ├── theme.py           # color palette
 └── theme.tcss         # Textual stylesheet
 ```
 
-All text content lives in [src/portfolio/content/portfolio.toml](src/portfolio/content/portfolio.toml),
-so the site can be updated without touching any UI code.
+All text content lives in [src/portfolio/content](src/portfolio/content), split
+into one file per section, so the site can be updated without touching any UI
+code. The menu in [home.toml](src/portfolio/content/home.toml) drives the rest:
+each entry loads the matching `content/<key>.toml`, so adding a section is just a
+new menu entry plus a new file.
 
 ## Running it locally
 

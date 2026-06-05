@@ -1,0 +1,36 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Home screen: your bio and the menu shown at the bottom.
+# ASCII art lives in art/portrait.txt and art/name.txt.
+# ─────────────────────────────────────────────────────────────────────────────
+
+[profile]
+handle = "atharva"
+intro = [
+  "i am a software engineer at elanco. I study comp sci at brunel.",
+]
+about = [
+  "i'm focused on ai agents, llm orchestration,",
+  "backend systems and cloud architecture.",
+  "i love golf and I'm currently learning japanese.",
+]
+closing = [
+  "explore the directories below to",
+  "learn more ↓",
+]
+
+# Bottom menu on the home screen. `kind` is "listing" or "contacts".
+# Each entry loads content/<key>.toml.
+[[menu]]
+label = "Creations"
+kind = "listing"
+key = "creations"
+
+[[menu]]
+label = "Reflections"
+kind = "listing"
+key = "reflections"
+
+[[menu]]
+label = "Contacts"
+kind = "contacts"
+key = "contacts"

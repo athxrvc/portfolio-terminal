@@ -1,0 +1,12 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Contacts — a simple list of links shown on the Contacts screen.
+# ─────────────────────────────────────────────────────────────────────────────
+
+[[contacts]]
+label = "WEB"
+value = "athxrvc.co.uk"
+
+[[contacts]]
+label = "GH"
+value = "github.com/athxrvc"
+

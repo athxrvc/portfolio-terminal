@@ -1,7 +1,16 @@
-"""Load portfolio content from a TOML file into typed dataclasses.
+"""Load portfolio content from per-section TOML files into typed dataclasses.
 
-All copy lives in ``content/portfolio.toml`` so the site can be updated without
-touching any UI code. ASCII art lives in ``art/``.
+Copy is split across ``content/`` so each part of the site lives in its own file:
+
+    content/home.toml          profile (bio) + the home-screen menu
+    content/creations.toml     the Creations section
+    content/reflections.toml   the Reflections section
+    content/contacts.toml      the Contacts links
+
+The home menu drives everything: each entry with ``kind = "listing"`` loads
+``content/<key>.toml`` as a section, and the ``kind = "contacts"`` entry loads
+``content/<key>.toml`` as a list of links. Adding a new section is just a new
+menu entry plus a matching file — no code changes. ASCII art lives in ``art/``.
 """
 
 from __future__ import annotations
@@ -11,7 +20,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 PKG_DIR = Path(__file__).resolve().parent
-CONTENT_PATH = PKG_DIR / "content" / "portfolio.toml"
+CONTENT_DIR = PKG_DIR / "content"
 ART_DIR = PKG_DIR / "art"
 
 
@@ -79,11 +88,33 @@ def _read_art(name: str, fallback: str = "") -> str:
     return fallback
 
 
-def load_content(path: Path | None = None) -> Content:
-    with open(path or CONTENT_PATH, "rb") as fh:
-        raw = tomllib.load(fh)
+def _load_toml(path: Path) -> dict:
+    with open(path, "rb") as fh:
+        return tomllib.load(fh)
 
-    p = raw.get("profile", {})
+
+def _build_section(key: str, raw: dict) -> Section:
+    groups: list[Group] = []
+    for graw in raw.get("groups", []):
+        items = [
+            Item(
+                title=iraw["title"],
+                body=iraw.get("body", []),
+                url=iraw.get("url"),
+                meta=iraw.get("meta"),
+            )
+            for iraw in graw.get("items", [])
+        ]
+        groups.append(Group(label=graw.get("label", ""), items=items))
+    return Section(key=key, title=raw.get("title", key.title()), groups=groups)
+
+
+def load_content(content_dir: Path | None = None) -> Content:
+    base = content_dir or CONTENT_DIR
+
+    home = _load_toml(base / "home.toml")
+
+    p = home.get("profile", {})
     handle = p.get("handle", "you")
     profile = Profile(
         handle=handle,
@@ -94,31 +125,26 @@ def load_content(path: Path | None = None) -> Content:
         closing=p.get("closing", []),
     )
 
-    sections: dict[str, Section] = {}
-    for key, sraw in raw.get("sections", {}).items():
-        groups: list[Group] = []
-        for graw in sraw.get("groups", []):
-            items = [
-                Item(
-                    title=iraw["title"],
-                    body=iraw.get("body", []),
-                    url=iraw.get("url"),
-                    meta=iraw.get("meta"),
-                )
-                for iraw in graw.get("items", [])
-            ]
-            groups.append(Group(label=graw.get("label", ""), items=items))
-        sections[key] = Section(
-            key=key, title=sraw.get("title", key.title()), groups=groups
-        )
-
-    contacts = [
-        Contact(label=c["label"], value=c["value"]) for c in raw.get("contacts", [])
-    ]
     menu = [
         MenuEntry(label=m["label"], kind=m["kind"], key=m["key"])
-        for m in raw.get("menu", [])
+        for m in home.get("menu", [])
     ]
+
+    # Each menu entry points at its own file in the same directory.
+    sections: dict[str, Section] = {}
+    contacts: list[Contact] = []
+    for entry in menu:
+        path = base / f"{entry.key}.toml"
+        if not path.exists():
+            continue
+        raw = _load_toml(path)
+        if entry.kind == "contacts":
+            contacts = [
+                Contact(label=c["label"], value=c["value"])
+                for c in raw.get("contacts", [])
+            ]
+        else:
+            sections[entry.key] = _build_section(entry.key, raw)
 
     return Content(profile=profile, sections=sections, contacts=contacts, menu=menu)
 
