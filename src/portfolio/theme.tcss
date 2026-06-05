@@ -1,0 +1,31 @@
+Screen {
+    background: #1b212c;
+    color: #c8d0da;
+}
+
+#columns {
+    height: 1fr;
+}
+
+#portrait {
+    width: auto;
+    padding: 1 3 0 2;
+    color: #6b7480;
+}
+
+#info {
+    width: 1fr;
+    padding: 1 2;
+}
+
+#body {
+    height: 1fr;
+    padding: 1 2;
+    max-width: 84;
+}
+
+.hint {
+    height: 1;
+    padding: 0 2 1 2;
+    color: #6b7480;
+}

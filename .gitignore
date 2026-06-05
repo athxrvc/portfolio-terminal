@@ -1,0 +1,13 @@
+# Python / uv
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+
+# Generated SSH host keys (never commit these)
+keys/
+
+# macOS
+.DS_Store
