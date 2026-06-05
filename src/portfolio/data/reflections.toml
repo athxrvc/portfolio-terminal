@@ -8,8 +8,8 @@ title = "Reflections"
 label = ""
 
 [[groups.items]]
-title = "why a terminal portfolio?"
+title = "Why a terminal portfolio?"
 meta = ""
 body = [
-  "portfolio websites are boring and my eyes needed a treat.",
+  "Portfolio websites are boring and my eyes needed a treat.",
 ]

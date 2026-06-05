@@ -6,15 +6,15 @@
 [profile]
 handle = "atharva"
 intro = [
-  "i am a software engineer at elanco. I study comp sci at brunel.",
+  "I am a Software Engineer at Elanco. I study comp sci at Brunel.",
 ]
 about = [
-  "i'm focused on ai agents, llm orchestration,",
-  "backend systems and cloud architecture.",
-  "i love golf and I'm currently learning japanese.",
+  "I'm focused on AI agents, LLM orchestration,",
+  "backend Systems and cloud architecture.",
+  "I love golf and I'm currently learning Japanese.",
 ]
 closing = [
-  "explore the directories below to",
+  "Explore the directories below to",
   "learn more ↓",
 ]
 
