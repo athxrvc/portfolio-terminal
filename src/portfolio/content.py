@@ -54,6 +54,7 @@ class Section:
 class Contact:
     label: str
     value: str
+    url: str | None = None
 
 
 @dataclass
@@ -91,6 +92,19 @@ def _read_art(name: str, fallback: str = "") -> str:
 def _load_toml(path: Path) -> dict:
     with open(path, "rb") as fh:
         return tomllib.load(fh)
+
+
+def _normalize_url(value: str) -> str:
+    """Turn a display value into an openable URL.
+
+    'github.com/me' -> 'https://github.com/me', 'me@x.com' -> 'mailto:me@x.com'.
+    """
+    v = value.strip()
+    if v.startswith(("http://", "https://", "mailto:")):
+        return v
+    if "@" in v and "/" not in v:
+        return f"mailto:{v}"
+    return f"https://{v}"
 
 
 def _build_section(key: str, raw: dict) -> Section:
@@ -140,7 +154,11 @@ def load_content(content_dir: Path | None = None) -> Content:
         raw = _load_toml(path)
         if entry.kind == "contacts":
             contacts = [
-                Contact(label=c["label"], value=c["value"])
+                Contact(
+                    label=c["label"],
+                    value=c["value"],
+                    url=c.get("url") or _normalize_url(c["value"]),
+                )
                 for c in raw.get("contacts", [])
             ]
         else:
