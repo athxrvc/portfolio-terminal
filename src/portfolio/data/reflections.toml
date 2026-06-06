@@ -1,0 +1,15 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Reflections section — short notes / writing
+# ─────────────────────────────────────────────────────────────────────────────
+
+title = "Reflections"
+
+[[groups]]
+label = ""
+
+[[groups.items]]
+title = "Why a terminal portfolio?"
+meta = ""
+body = [
+  "Portfolio websites are boring and my eyes needed a treat.",
+]
