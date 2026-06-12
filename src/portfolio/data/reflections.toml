@@ -13,3 +13,14 @@ meta = ""
 body = [
   "Portfolio websites tend to be a bit tragic, so I gave mine a personality.",
 ]
+
+[[groups.items]]
+title = "What am I doing now?"
+meta = ""
+body = [
+  "I study CS at Brunel, and I am in a weirdly exciting stretch of it all.",
+  "I am finishing my placement at Elanco, heading to IBM for the summer,", 
+  "then straight into final year in October.",
+  "Outside of all that, it is mostly games, guitar, travelling,",
+  "and keeping myself at least a little bit interesting.",
+]
