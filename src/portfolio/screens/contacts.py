@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import webbrowser
+
 from rich.text import Text
 from textual.app import ComposeResult
 from textual.binding import Binding
@@ -81,11 +83,13 @@ class ContactsScreen(Screen):
         contact = self.contacts[self.selected]
         if not contact.url:
             return
-        # open_url opens a browser locally; on a headless SSH host it's a no-op.
         try:
-            self.app.open_url(contact.url)
+            opened = webbrowser.open(contact.url, new=2, autoraise=True)
         except Exception:
-            pass
+            opened = False
+        if opened:
+            self.status_msg = f"\u2192 {contact.value} (opened)"
+            return
         # copy_to_clipboard uses OSC 52, which reaches the user's terminal over SSH.
         self.app.copy_to_clipboard(contact.url)
         self.status_msg = f"\u2192 {contact.value} (copied)"
