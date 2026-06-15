@@ -44,12 +44,13 @@ By default, local SSH mode listens on `127.0.0.1:2222`.
 
 ## Architecture
 
-```text
-SSH client
-  -> AsyncSSH server (src/portfolio/server.py)
-  -> PTY per connection
-  -> Textual app process (python -m portfolio.tui)
-  -> Rendered interactive UI back to client terminal
+```mermaid
+flowchart LR
+    A["Visitor runs<br/>ssh ssh.athxrvc.co.uk"] --> B["AsyncSSH server"]
+  B -->|"spawns a PTY,<br/>forwards bytes"| C["Textual app"]
+  C -->|"renders via"| D["Rich"]
+    E[(portfolio.toml)] --> C
+    C -. "reads copy from" .-> E
 ```
 
 Key design choice: each connection gets an isolated TUI session in its own
@@ -79,6 +80,7 @@ src/portfolio/
   theme.py         Theme constants
   theme.tcss       Textual stylesheet
 ```
+
 
 Primary content editing happens in `src/portfolio/data` and
 `src/portfolio/art`.
