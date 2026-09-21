@@ -90,6 +90,8 @@ async def handle_session(process: asyncssh.SSHServerProcess) -> None:
     env["COLUMNS"] = str(cols)
     env["LINES"] = str(rows)
     env["PYTHONUNBUFFERED"] = "1"
+    # Links should land on the visitor's clipboard, not launch a browser here.
+    env["PORTFOLIO_REMOTE"] = "1"
 
     child = await asyncio.create_subprocess_exec(
         sys.executable,
