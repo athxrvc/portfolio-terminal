@@ -1,12 +1,25 @@
 # ─────────────────────────────────────────────────────────────────────────────
 # Contacts
+# `value` is what's shown; `url` is what's opened/copied (derived from `value`
+# when omitted: mailto: for emails, https:// for everything else).
 # ─────────────────────────────────────────────────────────────────────────────
 
-[[contacts]]
-label = "LI"
-value = "https://www.linkedin.com/in/atharva-choudhary-1ba373277/"
+title = "contact"
+intro = "Say hello. I'm always up for a conversation about systems, cloud or AI tooling."
 
 [[contacts]]
-label = "GH"
+label = "email"
+value = "atharvavc04@gmail.com"
+
+[[contacts]]
+label = "github"
 value = "github.com/athxrvc"
 
+[[contacts]]
+label = "linkedin"
+value = "linkedin.com/in/atharva-choudhary-1ba373277"
+url = "https://www.linkedin.com/in/atharva-choudhary-1ba373277/"
+
+[[contacts]]
+label = "website"
+value = "athxrvc.github.io/portfolio"

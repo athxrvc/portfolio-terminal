@@ -2,15 +2,17 @@
 
 Copy is split across ``data/`` so each part of the site lives in its own file:
 
-    data/home.toml          profile (bio) + the home-screen menu
-    data/creations.toml     the Creations section
-    data/reflections.toml   the Reflections section
-    data/contacts.toml      the Contacts links
+    data/home.toml          profile, the "whoami" facts, and the tab bar (menu)
+    data/experience.toml    a listing (list + detail pane)
+    data/projects.toml      a listing
+    data/skills.toml        grouped skill chips
+    data/about.toml         a listing
+    data/contacts.toml      contact links
 
-The home menu drives everything: each entry with ``kind = "listing"`` loads
-``data/<key>.toml`` as a section, and the ``kind = "contacts"`` entry loads
-``data/<key>.toml`` as a list of links. Adding a new section is just a new
-menu entry plus a matching file — no code changes. ASCII art lives in ``art/``.
+The menu drives everything: each entry's ``kind`` (``listing``, ``skills`` or
+``contacts``) decides how ``data/<key>.toml`` is read and which view renders it.
+Adding a section is a new file plus one menu entry, with no code changes.
+ASCII wordmarks live in ``art/``.
 """
 
 from __future__ import annotations
@@ -25,11 +27,29 @@ ART_DIR = PKG_DIR / "art"
 
 
 @dataclass
+class Link:
+    label: str
+    url: str
+
+    @property
+    def text(self) -> str:
+        """The URL as a person would write it: no scheme, no trailing slash."""
+        for prefix in ("https://", "http://", "mailto:"):
+            if self.url.startswith(prefix):
+                return self.url[len(prefix):].rstrip("/")
+        return self.url.rstrip("/")
+
+
+@dataclass
 class Item:
     title: str
-    body: list[str] = field(default_factory=list)
-    url: str | None = None
+    subtitle: str | None = None
     meta: str | None = None
+    info: str | None = None
+    body: list[str] = field(default_factory=list)
+    bullets: list[str] = field(default_factory=list)
+    tags: list[str] = field(default_factory=list)
+    links: list[Link] = field(default_factory=list)
 
 
 @dataclass
@@ -39,46 +59,64 @@ class Group:
 
 
 @dataclass
-class Section:
-    key: str
-    title: str
-    groups: list[Group]
-
-    @property
-    def items(self) -> list[Item]:
-        """All items across groups, in display order."""
-        return [item for group in self.groups for item in group.items]
+class SkillGroup:
+    label: str
+    items: list[str]
 
 
 @dataclass
 class Contact:
     label: str
     value: str
-    url: str | None = None
+    url: str
+
+
+@dataclass
+class Section:
+    key: str
+    kind: str  # "listing" | "skills" | "contacts"
+    title: str
+    intro: str = ""
+    groups: list[Group] = field(default_factory=list)
+    skills: list[SkillGroup] = field(default_factory=list)
+    contacts: list[Contact] = field(default_factory=list)
+
+    @property
+    def items(self) -> list[Item]:
+        """All listing items across groups, in display order."""
+        return [item for group in self.groups for item in group.items]
 
 
 @dataclass
 class MenuEntry:
     label: str
-    kind: str  # "listing" | "contacts"
+    kind: str
     key: str
+
+
+@dataclass
+class Fact:
+    key: str
+    value: str
 
 
 @dataclass
 class Profile:
     handle: str
+    host: str
+    tagline: str
+    city: str
+    timezone: str
+    ssh: str
+    facts: list[Fact]
     name_art: str
-    portrait: str
-    intro: list[str]
-    about: list[str]
-    closing: list[str]
+    name_compact: str
 
 
 @dataclass
 class Content:
     profile: Profile
     sections: dict[str, Section]
-    contacts: list[Contact]
     menu: list[MenuEntry]
 
 
@@ -107,20 +145,60 @@ def _normalize_url(value: str) -> str:
     return f"https://{v}"
 
 
-def _build_section(key: str, raw: dict) -> Section:
+def _build_listing(key: str, raw: dict) -> Section:
     groups: list[Group] = []
     for graw in raw.get("groups", []):
         items = [
             Item(
                 title=iraw["title"],
-                body=iraw.get("body", []),
-                url=iraw.get("url"),
+                subtitle=iraw.get("subtitle"),
                 meta=iraw.get("meta"),
+                info=iraw.get("info"),
+                body=iraw.get("body", []),
+                bullets=iraw.get("bullets", []),
+                tags=iraw.get("tags", []),
+                links=[
+                    Link(label=lraw["label"], url=_normalize_url(lraw["url"]))
+                    for lraw in iraw.get("links", [])
+                ],
             )
             for iraw in graw.get("items", [])
         ]
         groups.append(Group(label=graw.get("label", ""), items=items))
-    return Section(key=key, title=raw.get("title", key.title()), groups=groups)
+    return Section(key=key, kind="listing", title=raw.get("title", key), groups=groups)
+
+
+def _build_skills(key: str, raw: dict) -> Section:
+    skills = [
+        SkillGroup(label=g["label"], items=g.get("items", []))
+        for g in raw.get("groups", [])
+    ]
+    return Section(key=key, kind="skills", title=raw.get("title", key), skills=skills)
+
+
+def _build_contacts(key: str, raw: dict) -> Section:
+    contacts = [
+        Contact(
+            label=c["label"],
+            value=c["value"],
+            url=c.get("url") or _normalize_url(c["value"]),
+        )
+        for c in raw.get("contacts", [])
+    ]
+    return Section(
+        key=key,
+        kind="contacts",
+        title=raw.get("title", key),
+        intro=raw.get("intro", ""),
+        contacts=contacts,
+    )
+
+
+_BUILDERS = {
+    "listing": _build_listing,
+    "skills": _build_skills,
+    "contacts": _build_contacts,
+}
 
 
 def load_content(content_dir: Path | None = None) -> Content:
@@ -132,11 +210,14 @@ def load_content(content_dir: Path | None = None) -> Content:
     handle = p.get("handle", "you")
     profile = Profile(
         handle=handle,
+        host=p.get("host", "portfolio"),
+        tagline=p.get("tagline", ""),
+        city=p.get("city", ""),
+        timezone=p.get("timezone", ""),
+        ssh=p.get("ssh", ""),
+        facts=[Fact(key=f["key"], value=f["value"]) for f in home.get("facts", [])],
         name_art=_read_art("name.txt", handle),
-        portrait=_read_art("portrait.txt", ""),
-        intro=p.get("intro", []),
-        about=p.get("about", []),
-        closing=p.get("closing", []),
+        name_compact=_read_art("name_compact.txt", handle),
     )
 
     menu = [
@@ -146,25 +227,14 @@ def load_content(content_dir: Path | None = None) -> Content:
 
     # Each menu entry points at its own file in the same directory.
     sections: dict[str, Section] = {}
-    contacts: list[Contact] = []
     for entry in menu:
         path = base / f"{entry.key}.toml"
-        if not path.exists():
+        builder = _BUILDERS.get(entry.kind)
+        if builder is None or not path.exists():
             continue
-        raw = _load_toml(path)
-        if entry.kind == "contacts":
-            contacts = [
-                Contact(
-                    label=c["label"],
-                    value=c["value"],
-                    url=c.get("url") or _normalize_url(c["value"]),
-                )
-                for c in raw.get("contacts", [])
-            ]
-        else:
-            sections[entry.key] = _build_section(entry.key, raw)
+        sections[entry.key] = builder(entry.key, _load_toml(path))
 
-    return Content(profile=profile, sections=sections, contacts=contacts, menu=menu)
+    return Content(profile=profile, sections=sections, menu=menu)
 
 
 _cache: Content | None = None

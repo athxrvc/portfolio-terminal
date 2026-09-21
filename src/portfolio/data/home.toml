@@ -1,36 +1,64 @@
 # ─────────────────────────────────────────────────────────────────────────────
-# Home screen
-# ASCII art lives in art/portrait.txt and art/name.txt.
+# Home screen: profile + the tab bar.
+# ASCII wordmarks live in art/name.txt (wide) and art/name_compact.txt (narrow).
 # ─────────────────────────────────────────────────────────────────────────────
 
 [profile]
-handle = "atharva"
-intro = [
-  "I am a Software Engineer at Elanco. I study comp sci at Brunel.",
-]
-about = [
-  "I'm focused on AI agents, LLM orchestration,",
-  "backend Systems and cloud architecture.",
-  "I play golf and I'm currently learning Japanese.",
-]
-closing = [
-  "Explore the directories below to",
-  "learn more ↓",
-]
+handle = "atharva"          # prompt:  atharva@athxrvc:~$
+host = "athxrvc"
+tagline = "Software engineer, drawn to the parts of a system you don't see."
+city = "London"             # shown next to a live clock in the top bar
+timezone = "Europe/London"
+ssh = "ssh.athxrvc.co.uk"   # shown in the footer
 
-# Bottom menu on the home screen. `kind` is "listing" or "contacts".
+# The "whoami" card under the tagline. Use " · " to separate values.
+[[facts]]
+key = "role"
+value = "Software Engineer"
+
+[[facts]]
+key = "based"
+value = "London, United Kingdom"
+
+[[facts]]
+key = "studying"
+value = "Computer Science · Brunel University London"
+
+[[facts]]
+key = "previously"
+value = "Elanco Animal Health · Headstarter AI"
+
+[[facts]]
+key = "focus"
+value = "Backend systems · Cloud · AI agents & LLM orchestration"
+
+[[facts]]
+key = "stack"
+value = "Python · TypeScript · Google Cloud · Terraform"
+
+# Tabs after "home". `kind` is "listing" (list + detail), "skills" or "contacts".
 # Each entry loads data/<key>.toml.
 [[menu]]
-label = "Creations"
+label = "experience"
 kind = "listing"
-key = "creations"
+key = "experience"
 
 [[menu]]
-label = "Reflections"
+label = "projects"
 kind = "listing"
-key = "reflections"
+key = "projects"
 
 [[menu]]
-label = "Contacts"
+label = "skills"
+kind = "skills"
+key = "skills"
+
+[[menu]]
+label = "about"
+kind = "listing"
+key = "about"
+
+[[menu]]
+label = "contact"
 kind = "contacts"
 key = "contacts"

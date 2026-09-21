@@ -1,0 +1,42 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# About: short notes, same item format as the other listings
+# ─────────────────────────────────────────────────────────────────────────────
+
+title = "about"
+
+[[groups]]
+label = ""
+
+[[groups.items]]
+title = "What I'm up to"
+meta = "Right now"
+body = [
+  "I just wrapped up my placement year as a Software Engineer at Elanco Animal Health, and I'm heading into the final year of Computer Science at Brunel.",
+  "I'm focused on AI agents, LLM orchestration, backend systems and cloud architecture, and I'm learning Japanese on the side.",
+]
+
+[[groups.items]]
+title = "Why a terminal?"
+meta = "This portfolio"
+body = [
+  "Portfolio websites tend to be a bit tragic, so I gave mine a personality. This one is a tiny sandboxed product you can SSH into: no browser, no account, no shell.",
+  "Prefer the regular web? The website version lives at athxrvc.github.io/portfolio.",
+]
+links = [{ label = "website", url = "athxrvc.github.io/portfolio" }]
+
+[[groups.items]]
+title = "Off the clock"
+meta = "Interests"
+body = ["Away from the keyboard you'll find me with:"]
+tags = [
+  "Football",
+  "Formula 1",
+  "Golf",
+  "Hiking",
+  "Travel",
+  "Financial markets",
+  "Fashion",
+  "DJing",
+  "Learning Japanese",
+  "Building PCs",
+]

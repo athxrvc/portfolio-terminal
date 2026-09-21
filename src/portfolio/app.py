@@ -5,7 +5,8 @@ from __future__ import annotations
 from textual.app import App
 from textual.binding import Binding
 
-from .screens.home import HomeScreen
+from .shell import Shell
+from .theme import THEME
 
 
 class PortfolioApp(App):
@@ -13,7 +14,15 @@ class PortfolioApp(App):
 
     CSS_PATH = "theme.tcss"
     TITLE = "athxrvc"
-    BINDINGS = [Binding("q", "quit", "quit", show=False)]
+    # The command palette exposes app-level commands (e.g. saving a screenshot
+    # to disk) that anonymous visitors have no business running on the server.
+    ENABLE_COMMAND_PALETTE = False
+    BINDINGS = [
+        Binding("q", "quit", "quit", show=False),
+        Binding("ctrl+c", "quit", "quit", show=False, priority=True),
+    ]
 
     def on_mount(self) -> None:
-        self.push_screen(HomeScreen())
+        self.register_theme(THEME)
+        self.theme = THEME.name
+        self.push_screen(Shell())

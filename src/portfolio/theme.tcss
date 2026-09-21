@@ -1,31 +1,210 @@
+/* Palette: keep in sync with theme.py */
+$pf-bg: #0a0c10;
+$pf-surface: #10141b;
+$pf-raised: #171d27;
+$pf-line: #222a35;
+$pf-fg: #c9d1d9;
+$pf-dim: #7d8794;
+$pf-muted: #4b5563;
+$pf-accent: #7ad1c0;
+$pf-title: #eef2f6;
+
 Screen {
-    background: #000000;
-    color: #c8d0da;
+    background: $pf-bg;
+    color: $pf-fg;
+    scrollbar-background: $pf-bg;
+    scrollbar-background-hover: $pf-bg;
+    scrollbar-background-active: $pf-bg;
+    scrollbar-color: $pf-line;
+    scrollbar-color-hover: $pf-muted;
+    scrollbar-color-active: $pf-accent;
+    scrollbar-size-vertical: 1;
 }
 
-#columns {
-    height: 1fr;
+/* ── Chrome ───────────────────────────────────────────────────────────── */
+
+#topbar {
+    height: 1;
+    padding: 0 2;
 }
 
-#portrait {
-    width: auto;
-    padding: 1 3 0 2;
-    color: #6b7480;
-}
-
-#info {
+#prompt {
     width: 1fr;
-    padding: 1 2;
 }
 
-#body {
+#status {
+    width: auto;
+}
+
+#tabs, #rule {
+    height: 1;
+}
+
+#tabs {
+    link-style: none;
+    link-style-hover: bold;
+}
+
+#switcher {
     height: 1fr;
-    padding: 1 2;
-    max-width: 84;
+    padding: 1 2 0 2;
 }
 
-.hint {
+#footer {
+    height: 1;
+    padding: 0 2;
+    background: $pf-surface;
+}
+
+#hints {
+    width: 1fr;
+}
+
+#address {
+    width: auto;
+}
+
+/* ── Home ─────────────────────────────────────────────────────────────── */
+
+HomeView {
+    height: 1fr;
+    align-vertical: middle;
+}
+
+HomeView > Static {
+    height: auto;
+}
+
+HomeView #wordmark {
+    margin-bottom: 1;
+}
+
+HomeView #tagline {
+    margin-bottom: 1;
+}
+
+/* ── Panels (skills, contacts, listing panes) ─────────────────────────── */
+
+SkillsView, ContactsView, ListingView #detail, ListingView OptionList {
+    border: round $pf-line;
+    border-title-color: $pf-dim;
+    border-title-style: bold;
+}
+
+SkillsView {
+    height: auto;
+    max-height: 100%;
+    padding: 1 2 0 2;
+}
+
+ContactsView {
     height: auto;
     padding: 1 2;
-    color: #6b7480;
+}
+
+ContactsView:focus-within, ListingView OptionList:focus {
+    border: round $pf-accent 60%;
+    border-title-color: $pf-accent;
+}
+
+ContactsView #intro {
+    height: auto;
+    margin-bottom: 1;
+}
+
+/* ── Option lists: transparent rows, highlighted row is a raised bar ──── */
+
+OptionList {
+    background: transparent;
+    color: $pf-fg;
+    padding: 0 1;
+    height: 1fr;
+    background-tint: transparent;
+    scrollbar-size-vertical: 1;
+}
+
+OptionList:focus {
+    background-tint: transparent;
+}
+
+OptionList > .option-list--option {
+    padding: 0 1;
+}
+
+OptionList > .option-list--option-hover {
+    background: $pf-surface;
+}
+
+OptionList > .option-list--option-highlighted,
+OptionList:focus > .option-list--option-highlighted {
+    background: $pf-raised;
+    color: $pf-accent;
+    text-style: bold;
+}
+
+OptionList > .option-list--option-disabled {
+    color: $pf-muted;
+}
+
+ContactsView OptionList {
+    border: none;
+    padding: 0;
+    height: auto;
+}
+
+ContactsView OptionList:focus {
+    border: none;
+}
+
+/* ── Listing: list left, detail right ─────────────────────────────────── */
+
+ListingView {
+    height: 1fr;
+    layout: horizontal;
+}
+
+ListingView OptionList {
+    width: 34;
+    height: 1fr;
+}
+
+ListingView.-slim OptionList {
+    width: 30;
+}
+
+ListingView #detail {
+    width: 1fr;
+    height: 1fr;
+    padding: 1 2;
+}
+
+ListingView.-short #detail {
+    padding: 0 2;
+}
+
+ListingView #detail-body {
+    height: auto;
+}
+
+ListingView.-narrow {
+    layout: vertical;
+}
+
+ListingView.-narrow OptionList {
+    width: 1fr;
+    height: 45%;
+}
+
+/* ── Toasts ───────────────────────────────────────────────────────────── */
+
+Toast {
+    background: $pf-surface;
+    color: $pf-fg;
+    border-left: outer $pf-accent;
+    width: auto;
+    max-width: 60;
+}
+
+Toast .toast--title {
+    color: $pf-accent;
 }
