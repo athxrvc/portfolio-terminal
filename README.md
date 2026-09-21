@@ -18,8 +18,8 @@ Most portfolios are websites, and I can't make good websites. This one is a
 terminal product experience:
 
 - **Connect** over SSH
-- **See** ASCII branding, a portrait, and a bio
-- **Navigate** sections with arrow keys
+- **Land** on a gradient wordmark, a typed tagline and a `whoami` card
+- **Navigate** with tabs, arrow keys, number keys or the mouse
 - **Never** get a real shell, command execution, or file transfer
 
 It's hosted on a tiny VPS and replies to anyone.
@@ -29,9 +29,10 @@ It's hosted on a tiny VPS and replies to anyone.
 ## Features
 
 - 🌐 **SSH-native.** Any client works — `ssh`, Termius, Blink, PuTTY.
-- ⌨️ **Keyboard driven.** ← / → / ↑ / ↓ to move, Enter to open, Esc to back, `q` to quit.
-- 🎨 **ASCII-first.** Custom portrait and name banner; sparkles twinkle around the banner.
-- 🔒 **Sandboxed.** Anonymous auth, no shell channel, no SFTP, no exec. Every visitor gets a fresh isolated TUI in their own PTY.
+- ⌨️ **Keyboard *and* mouse.** Tabs, `1`–`6` to jump, ↑ / ↓ (or `j` / `k`) to select, Enter to open, `c` to copy, Esc for home, `q` to quit. Click tabs and rows too.
+- 🎨 **Modern, minimal.** Prompt-style header, live London clock, master-detail panes, tag chips, and a shimmering gradient wordmark above a typed-out tagline.
+- 📱 **Responsive.** Reflows down to ~60 columns: compact wordmark, stacked panes, and footer hints that drop by priority.
+- 🔒 **Sandboxed.** Anonymous auth, no shell channel, no SFTP, no exec, no command palette. Every visitor gets a fresh isolated TUI in their own PTY.
 - 📝 **Content as data.** All copy lives in TOML files under `src/portfolio/data/`. Adding a section is a new file plus one menu entry.
 - 🪶 **Lightweight.** Single Python process, no database, no frontend build.
 
@@ -100,6 +101,10 @@ Key design points:
 - **Raw bytes, no encoding.** Bytes pass between the SSH channel and the
   PTY unchanged (`encoding=None` on the AsyncSSH server), so Rich/Textual
   terminal escape sequences round-trip cleanly.
+- **Links go to the visitor.** The server sets `PORTFOLIO_REMOTE=1` for the
+  TUI, so Enter on a link copies it to the visitor's clipboard over OSC 52
+  rather than launching a browser on the VPS. (Run locally and it opens your
+  browser instead.)
 - **Content as data.** All copy lives in TOML under `src/portfolio/data/`.
   Adding a new section is a new file plus one menu entry — no code changes.
 
@@ -125,24 +130,27 @@ src/portfolio/
   __init__.py            package marker + version
   __main__.py            `python -m portfolio`  → starts the SSH server
   server.py              AsyncSSH server, host-key generation, PTY bridge
-  app.py                 Textual App root; pushes HomeScreen on mount
+  app.py                 Textual App root; registers the theme, pushes Shell
   tui.py                 `portfolio-tui`  → runs the TUI in this terminal
+  shell.py               Persistent frame: prompt, tab bar, clock, footer hints, keys
   content.py             TOML loader, dataclasses, in-memory cache
-  theme.py               Color constants (BG / FG / DIM / ACCENT / TITLE)
+  theme.py               Palette constants, Textual theme, tag-chip renderable
   theme.tcss             Textual stylesheet
   art/
-    portrait.txt         ASCII portrait shown on the home screen
-    name.txt             ASCII name banner (sparkles are drawn programmatically)
-  screens/
-    __init__.py
-    home.py              Portrait + bio + section menu (sparkle animation)
-    listing.py           Generic list screen; arrow-key nav, opens DetailScreen
-    detail.py            Detail screen for a single item
-    contacts.py          Selectable contacts; OSC 8 hyperlinks + OSC 52 clipboard fallback
+    name.txt             Wide ASCII wordmark (gradient + shimmer are drawn in code)
+    name_compact.txt     Wordmark used on narrow / short terminals
+  views/
+    home.py              Wordmark, typed tagline, "whoami" card
+    listing.py           Master-detail list (experience, projects, about)
+    skills.py            Grouped skill chips
+    contacts.py          Selectable contacts; open or copy
+    links.py             Open in browser locally, copy to clipboard over SSH
   data/
-    home.toml            Profile + home-screen menu (drives everything else)
-    creations.toml       The Creations section
-    reflections.toml     The Reflections section
+    home.toml            Profile, "whoami" facts, and the tab bar (menu)
+    experience.toml      Experience + education
+    projects.toml        Projects
+    skills.toml          Skills
+    about.toml           About / notes
     contacts.toml        Contact list
 ```
 
@@ -159,97 +167,119 @@ All visible copy is data. You shouldn't need to touch code to:
 - add or remove a contact
 - swap the ASCII art
 
-### `data/home.toml` — profile + menu
+### `data/home.toml` — profile + tabs
 
-This file defines the bio and drives every other section via the `menu`.
+This file defines the profile, the `whoami` card and the tab bar.
 
 ```toml
 [profile]
-handle = "atharva"
-intro  = ["Short tagline line 1", "Short tagline line 2"]
-about  = ["About line 1", "About line 2", "About line 3"]
-closing = ["", "Prompt to keep exploring"]
+handle   = "atharva"         # prompt:  atharva@athxrvc:~$
+host     = "athxrvc"
+tagline  = "One line that gets typed out on load."
+city     = "London"          # shown next to a live clock
+timezone = "Europe/London"
+ssh      = "ssh.example.com" # shown in the footer
+
+[[facts]]                    # rows of the whoami card; " · " separates values
+key   = "role"
+value = "Software Engineer"
 ```
 
-The home sparkles are drawn by `_glitter(name_art, frame)` in
-`screens/home.py`; the actual letters come from `art/name.txt`.
-
-The `menu` block controls the bottom row of the home screen:
+The `menu` block defines the tabs after `home`:
 
 ```toml
 [[menu]]
-label = "Creations"
-kind  = "listing"     # loads data/creations.toml as a list of items
-key   = "creations"
+label = "projects"
+kind  = "listing"     # list + detail pane; loads data/projects.toml
+key   = "projects"
 
 [[menu]]
-label = "Contacts"
-kind  = "contacts"    # loads data/contacts.toml as a list of links
+label = "skills"
+kind  = "skills"      # grouped chips
+key   = "skills"
+
+[[menu]]
+label = "contact"
+kind  = "contacts"    # selectable links
 key   = "contacts"
 ```
 
 To add a new section, drop a `data/<key>.toml` file and add an entry here —
-**no code changes needed**.
+**no code changes needed**. Tabs are numbered in order (`1` is home), and the
+tab bar collapses to numbers on narrow terminals.
 
-### Section files — `data/<section>.toml`
+### Listing files — `data/<section>.toml`
 
-Listing sections are broken into `groups`, each containing `items`:
+`kind = "listing"` sections are broken into `groups`, each containing `items`:
 
 ```toml
-title = "Creations"
+title = "projects"
 
 [[groups]]
-label = "projects"
+label = "featured"
 
   [[groups.items]]
-  title = "Terminal Based Portfolio"
-  url   = "ssh.athxrvc.co.uk"
-  meta  = "2025"
-  body  = [
-    "The portfolio you're browsing right now,",
-    "served over SSH.",
-    "Built in Python with Textual for the UI",
-    "and asyncSSH handling the server side.",
-  ]
+  title    = "Homeport"
+  subtitle = "Open source · MIT"         # accent line in the detail pane
+  meta     = "Self-hosted LLM gateway"   # second line in the list
+  info     = "Dim line under the subtitle"   # optional
+  body     = ["A paragraph. Soft-wrapped, so write it on one line."]
+  bullets  = ["Each one becomes a ▸ bullet."]
+  tags     = ["Ollama", "LiteLLM"]       # rendered as chips
+  links    = [{ label = "github", url = "github.com/athxrvc/Homeport" }]
 ```
 
-Each item has `title`, optional `meta` (small grey subline under the title),
-optional `url` (rendered with a "View →" arrow on the detail screen), and a
-list-only `body` of paragraphs. Group labels are optional; omit them by
-setting `label = ""`.
+Only `title` is required. Enter opens the first link (or copies it when
+connected over SSH); `c` always copies it. Set `label = ""` on a group to hide
+its heading.
+
+### Skills — `data/skills.toml`
+
+`kind = "skills"` takes groups of chips:
+
+```toml
+[[groups]]
+label = "languages"
+items = ["Python", "TypeScript"]
+```
 
 ### Contacts — `data/contacts.toml`
 
 ```toml
-[[contacts]]
-label = "LI"
-value = "linkedin.com/in/atharva-c-1ba373277/"
+title = "contact"
+intro = "A friendly line above the list."
 
 [[contacts]]
-label = "GH"
+label = "github"
 value = "github.com/athxrvc"
 
+[[contacts]]
+label = "email"
+value = "me@example.com"
 ```
 
 `url` is auto-derived from `value` by `content._normalize_url`:
 
 - `github.com/athxrvc` → `https://github.com/athxrvc`
-- `me@example.com` → `mailto:me@example.com`
+- `me@example.com` → `mailto:me@example.com` (copied as a bare address)
 - `https://...` / `mailto:...` pass through unchanged
 
-On the contacts screen, Enter **tries the browser first**, then falls back to
-**clipboard via OSC 52** (works through SSH). The status bar shows which one
-worked.
+Enter **tries the browser first** when running locally, and otherwise copies
+to the **clipboard via OSC 52** (works through SSH). A toast shows which one
+happened.
 
 ### ASCII art
 
-Drop two files into `src/portfolio/art/`:
+Two files in `src/portfolio/art/`:
 
-- `name.txt` — wordmark shown on the home screen (anything up to ~24 cols wide)
-- `portrait.txt` — left column on the home screen
+- `name.txt` — the wide wordmark (~60 cols, 6 rows) shown when there's room
+- `name_compact.txt` — the fallback for narrow or short terminals
 
-Both are read verbatim and rendered through Rich, so monospace alignment in
-your editor is what the user sees.
+Both are read verbatim. The teal→blue gradient and the shimmer sweep are drawn
+in code (`views/home.py`); block glyphs (`█ ▀ ▄`) get the gradient and any
+other character is drawn as a dimmed shadow. Regenerate with
+[pyfiglet](https://github.com/pwaller/pyfiglet) (the `ansi_shadow` and `pagga`
+fonts are what ship) or draw your own.
 
 ---
 
@@ -260,10 +290,11 @@ your editor is what the user sees.
 | Listen address | `PORTFOLIO_HOST` env var | `127.0.0.1` |
 | Listen port | `PORTFOLIO_PORT` env var | `2222` |
 | Host key path | `PORTFOLIO_HOST_KEY` env var | `keys/ssh_host_key` |
-| Colours | `src/portfolio/theme.py` (`BG / FG / DIM / ACCENT / TITLE`) | muted dark + teal |
+| Colours | `src/portfolio/theme.py` **and** the `$pf-*` variables at the top of `theme.tcss` | near-black + teal/blue |
 | Stylesheet | `src/portfolio/theme.tcss` | — |
-| Wordmark / portrait | `src/portfolio/art/*.txt` | — |
-| Sparkle effect | `src/portfolio/screens/home.py` (`SPARKLES`, `SPARKLE_STYLES`, `GLITTER_INTERVAL`) | — |
+| Wordmark | `src/portfolio/art/*.txt` | — |
+| Intro / shimmer timing | `src/portfolio/views/home.py` (`TYPE_SPEED`, `SWEEP_SPEED`, `IDLE_FRAMES`, …) | typed in ~1s, shimmer every ~9s |
+| Responsive breakpoints | `views/listing.py` (`NARROW_BELOW`, `SLIM_BELOW`, `SHORT_BELOW`), `views/home.py` (`BIG_MIN_*`) | — |
 
 The console-script entrypoints are defined in `pyproject.toml`:
 
@@ -276,12 +307,17 @@ The console-script entrypoints are defined in `pyproject.toml`:
 
 | Key | Where | Action |
 |-----|-------|--------|
-| ← / → | Home | Move between menu sections |
-| ↑ / ↓ | Home | Move between menu sections |
-| ↑ / ↓ | Listing / Contacts | Move between items |
-| Enter | any | Open the highlighted thing |
-| Esc | Listing / Detail / Contacts | Go back |
-| `q` | any | Quit |
+| ← / → , Tab / Shift+Tab | any | Previous / next tab |
+| `1`–`6` | any | Jump to a tab (`1` is home) |
+| ↑ / ↓ , `j` / `k` | Lists, contacts | Move the selection |
+| Enter | Lists, contacts | Open the highlighted link (copies it over SSH) |
+| `c` | Lists, contacts | Copy the highlighted link |
+| Esc | any | Back to home |
+| `q` , Ctrl+C | any | Quit |
+| any key | Home (during intro) | Skip the typing animation |
+
+Mouse works too: click a tab, a list row, or a contact. The mouse wheel
+scrolls the detail pane.
 
 ---
 
@@ -395,8 +431,8 @@ sudo ufw enable
   (it's gitignored for a reason: keep it out of the repo, but back it up
   off-host).
 - **For screenshots / recordings** — Use `asciinema`, `script`, or just
-  copy from a wide terminal. The portrait + name banner need roughly
-  100×32 to look right.
+  copy from a wide terminal. The full wordmark layout needs roughly
+  80×24 or more; smaller windows switch to a compact layout automatically.
 
 ---
 
