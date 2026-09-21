@@ -1,0 +1,49 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Experience
+# Item fields: title, subtitle (accent line in the detail pane), meta (second line
+# in the list), info (dim line under the subtitle), body (paragraphs), bullets,
+# tags (chips), links ({ label, url }).
+# ─────────────────────────────────────────────────────────────────────────────
+
+title = "experience"
+
+[[groups]]
+label = "work"
+
+[[groups.items]]
+title = "Elanco Animal Health"
+subtitle = "Software Engineer · Placement year"
+meta = "Jun 2025 – Jul 2026"
+info = "Hook, UK"
+bullets = [
+  "Architected and maintained GCP video-processing pipelines for computer vision.",
+  "Automated manual video-analysis workflows.",
+  "Built backend services and UI features for video lifecycle management.",
+  "Contributed to system design decisions on scalability, performance and reliability.",
+]
+tags = ["Google Cloud", "Terraform", "Python", "TypeScript"]
+
+[[groups.items]]
+title = "Headstarter AI"
+subtitle = "Software Engineering Fellow"
+meta = "Jul 2024 – Oct 2024"
+info = "New York, USA"
+bullets = [
+  "Built 5 AI apps and APIs.",
+  "Coached by engineers from Amazon, Bloomberg and Capital One.",
+  "Led a team of 4 across 3 global hackathons.",
+]
+tags = ["Next.js", "OpenAI", "Pinecone", "Stripe API"]
+
+[[groups]]
+label = "education"
+
+[[groups.items]]
+title = "Brunel University London"
+subtitle = "Computer Science"
+meta = "Computer Science"
+info = "London, UK"
+body = [
+  "Studying Computer Science, with a placement year at Elanco Animal Health in the middle. Back for the final year.",
+]
+tags = ["Computer Science"]

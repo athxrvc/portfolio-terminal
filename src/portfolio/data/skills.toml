@@ -1,0 +1,25 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Skills: label + a flat list of chips per group
+# ─────────────────────────────────────────────────────────────────────────────
+
+title = "skills"
+
+[[groups]]
+label = "languages"
+items = ["Python", "Java", "TypeScript", "JavaScript"]
+
+[[groups]]
+label = "cloud & infra"
+items = ["Google Cloud", "Terraform", "Linux"]
+
+[[groups]]
+label = "backend & data"
+items = ["Node.js", "Express", "PostgreSQL", "MySQL", "MongoDB"]
+
+[[groups]]
+label = "web"
+items = ["React", "Next.js", "Tailwind CSS"]
+
+[[groups]]
+label = "ai tooling"
+items = ["Ollama", "LiteLLM", "OpenAI API", "Pinecone"]

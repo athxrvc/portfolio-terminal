@@ -1,0 +1,67 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Projects
+# ─────────────────────────────────────────────────────────────────────────────
+
+title = "projects"
+
+[[groups]]
+label = "featured"
+
+[[groups.items]]
+title = "Homeport"
+subtitle = "Open source · MIT"
+meta = "Self-hosted LLM gateway"
+body = [
+  "A self-hosted, OpenAI-compatible API for local LLMs. Run models on your own hardware and talk to them with the tooling you already use.",
+]
+tags = ["Ollama", "LiteLLM", "Cloudflare Tunnel", "PowerShell", "Bash"]
+links = [{ label = "github", url = "github.com/athxrvc/Homeport" }]
+
+[[groups.items]]
+title = "portfolio-terminal"
+subtitle = "The thing you're looking at"
+meta = "Portfolio over SSH"
+body = [
+  "This portfolio, served over SSH. Every visitor gets their own sandboxed Textual app in a PTY: no shell, no command execution, no file transfer.",
+]
+tags = ["Python", "AsyncSSH", "Textual", "TOML"]
+links = [{ label = "github", url = "github.com/athxrvc/portfolio-terminal" }]
+
+[[groups.items]]
+title = "openclaw-discord"
+subtitle = "Discord assistant"
+meta = "Long-term memory bot"
+body = [
+  "A Discord assistant with long-term memory, built on AI models. Supports local LLMs, memory management and customisable channel modes, as a foundation for deeper OpenClaw integration.",
+]
+tags = ["Python", "PostgreSQL", "Prisma", "Terraform", "GCP"]
+links = [{ label = "github", url = "github.com/athxrvc/openclaw-discord" }]
+
+[[groups]]
+label = "more"
+
+[[groups.items]]
+title = "readme-gen"
+subtitle = "VS Code extension"
+meta = "AI README generation"
+body = ["An AI-powered VS Code extension that generates READMEs for you."]
+tags = ["VS Code", "AI"]
+links = [{ label = "github", url = "github.com/athxrvc/readme-gen" }]
+
+[[groups.items]]
+title = "Currency Converter"
+subtitle = "Web app"
+meta = "Live exchange rates"
+body = ["A converter that pulls live exchange rates."]
+links = [
+  { label = "github", url = "github.com/athxrvc/Currency-Converter" },
+  { label = "demo", url = "athxrva07.github.io/Currency-Converter" },
+]
+
+[[groups.items]]
+title = "SwiftBot"
+subtitle = "Robotics"
+meta = "Raspberry Pi robot"
+body = ["A Raspberry Pi robot with QR-code scanning."]
+tags = ["Raspberry Pi"]
+links = [{ label = "github", url = "github.com/athxrvc/Draw-Shapes" }]
