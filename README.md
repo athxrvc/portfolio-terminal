@@ -310,13 +310,15 @@ The console-script entrypoints are defined in `pyproject.toml`:
 | ← / → , Tab / Shift+Tab | any | Previous / next tab |
 | `1`–`6` | any | Jump to a tab (`1` is home) |
 | ↑ / ↓ , `j` / `k` | Lists, contacts | Move the selection |
-| Enter | Lists, contacts | Open the highlighted link (copies it over SSH) |
+| Enter | Lists, contacts | Open the highlighted item's first link (copies it over SSH) |
 | `c` | Lists, contacts | Copy the highlighted link |
 | Esc | any | Back to home |
 | `q` , Ctrl+C | any | Quit |
 | any key | Home (during intro) | Skip the typing animation |
 
-Mouse works too: click a tab, a list row, or a contact. The mouse wheel
+Mouse works too. Clicking a tab switches to it, and clicking a row in a list
+only previews the item; to open a link, click the link itself in the detail
+pane (or press Enter). In contacts, clicking a row opens it. The mouse wheel
 scrolls the detail pane.
 
 ---

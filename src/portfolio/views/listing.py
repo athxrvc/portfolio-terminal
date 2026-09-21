@@ -3,10 +3,13 @@
 from __future__ import annotations
 
 from rich.console import Group, RenderableType
+from rich.style import Style
 from rich.table import Table
 from rich.text import Text
 from textual.app import ComposeResult
+from textual.binding import Binding
 from textual.containers import VerticalScroll
+from textual.message import Message
 from textual.widget import Widget
 from textual.widgets import OptionList, Static
 from textual.widgets.option_list import Option
@@ -18,6 +21,23 @@ from .links import copy_link, open_link
 NARROW_BELOW = 72   # stack the panes vertically under this width
 SLIM_BELOW = 100    # give the list a slimmer column under this width
 SHORT_BELOW = 22    # tighten the detail pane's padding under this height
+
+
+class BrowseList(OptionList):
+    """An option list where a click only highlights a row.
+
+    OptionList treats a click and Enter alike (both post ``OptionSelected``).
+    Here Enter posts ``Activated`` instead, so a click can just preview the
+    item while Enter is still available as the keyboard way to open its link.
+    """
+
+    BINDINGS = [Binding("enter", "activate", "open", show=False)]
+
+    class Activated(Message):
+        """Enter was pressed on the highlighted row."""
+
+    def action_activate(self) -> None:
+        self.post_message(self.Activated())
 
 
 def _list_option(item: Item, index: int) -> Option:
@@ -64,9 +84,13 @@ def _detail(item: Item) -> RenderableType:
         links.add_column(no_wrap=True)
         links.add_column()
         for link in item.links:
+            # A plain "link" style would make Textual call app.open_url, which
+            # opens a browser on the server when served over SSH. Route the
+            # click through the shell so it can copy to the clipboard instead.
+            click = f"screen.open_link({link.url!r}, {link.label!r})"
             links.add_row(
                 Text(link.label, style=DIM),
-                Text(link.text + " ↗", style=f"{ACCENT} link {link.url}"),
+                Text(link.text + " ↗", style=Style(color=ACCENT, meta={"@click": click})),
             )
         parts += [Text(""), links]
 
@@ -85,7 +109,7 @@ class ListingView(Widget):
         self._option_index: dict[int, int] = {}  # option-list row -> item index
 
     def compose(self) -> ComposeResult:
-        yield OptionList(id="items")
+        yield BrowseList(id="items")
         with VerticalScroll(id="detail"):
             yield Static(id="detail-body")
 
@@ -130,7 +154,7 @@ class ListingView(Widget):
         detail.scroll_home(animate=False)
         self.query_one("#detail-body", Static).update(_detail(item))
 
-    def on_option_list_option_selected(self, event: OptionList.OptionSelected) -> None:
+    def on_browse_list_activated(self, event: BrowseList.Activated) -> None:
         event.stop()
         self.open_link()
 

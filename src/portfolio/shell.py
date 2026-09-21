@@ -19,6 +19,7 @@ from .content import Content, get_content
 from .theme import ACCENT, ACCENT_2, DIM, FG, LINE, MUTED, OK, TITLE
 from .views.contacts import ContactsView
 from .views.home import HomeView
+from .views.links import open_link
 from .views.listing import ListingView
 from .views.skills import SkillsView
 
@@ -109,6 +110,10 @@ class Shell(Screen):
         focused = self.focused
         if isinstance(focused, OptionList):
             focused.action_cursor_down() if delta > 0 else focused.action_cursor_up()
+
+    def action_open_link(self, url: str, label: str) -> None:
+        """Target of clickable links in the views (see views/links.py)."""
+        open_link(self.app, url, label)
 
     def action_copy(self) -> None:
         copy = getattr(self._view(), "copy_link", None)
