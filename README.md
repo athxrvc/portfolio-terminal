@@ -7,9 +7,6 @@
 ssh ssh.athxrvc.co.uk
 ```
 
-That's the entire pitch: drop a stranger into a tiny sandboxed terminal product
-and walk them around.
-
 ---
 
 ## Why this exists
